@@ -3,13 +3,16 @@ class Node:
         self.parents = {}
         self.children = {}
         self.id = node_id
+        self.color = "white"
+        self.distance = float('inf')
+        self.prev = None
         self.pos = pos
 
     def getParents(self) -> dict:
         return self.parents
     def addParent(self,node_id: int,weight:float):
+
         self.parents[node_id]=weight
-    
     def getChildren(self) -> dict:
         return self.children
     def addChild(self,node_id: int,weight:float):
@@ -17,3 +20,19 @@ class Node:
 
     def getId(self):
         return self.id
+
+
+    def getColor(self) -> str:
+        return self.color
+    def setColor(self,c:str):
+        self.color = c
+    
+    def getDistance(self) -> float:
+        return self.distance
+    def setDistance(self,d:float):
+        self.distance = d
+
+    def getPrev(self):
+        return self.prev
+    def setPrev(self,n:int):
+        self.prev = n
