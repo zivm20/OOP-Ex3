@@ -1,3 +1,4 @@
+import random
 class Node:
     def __init__(self,node_id: int, pos: tuple = None):
         self.parents = {}
@@ -6,7 +7,10 @@ class Node:
         self.color = "white"
         self.distance = float('inf')
         self.prev = None
-        self.pos = pos
+        if pos==None:
+            pos =tuple(random.randrange(-9,10) for _ in range(3))
+        self.pos=pos
+
 
     def getParents(self) -> dict:
         return self.parents

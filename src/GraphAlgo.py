@@ -3,6 +3,7 @@ from GraphInterface import GraphInterface
 from DiGraph import DiGraph
 import json
 import matplotlib.pyplot as plt
+from matplotlib.patches import ConnectionPatch
 from typing import List
 class GraphAlgo(GraphAlgoInterface):
     def __init__(self,g:GraphInterface = None):
@@ -27,24 +28,35 @@ class GraphAlgo(GraphAlgoInterface):
 
         except:
             return False
-        
+
+        return True
+
+
+
+
     def save_to_json(self, file_name: str) -> bool:
-        data = {}
-        data["Edges"] = []
-        data["Nodes"] = []
-        for idx in self.graph.get_all_v():
-            for childIdx,w in self.graph.all_out_edges_of_node(idx).items():
-                data["Edges"].append({
-                    "src":idx,
-                    "w":w,
-                    "dest":childIdx
+        try:
+            data = {}
+            data["Edges"] = []
+            data["Nodes"] = []
+            for idx in self.graph.get_all_v():
+                for childIdx,w in self.graph.all_out_edges_of_node(idx).items():
+                    data["Edges"].append({
+                        "src":idx,
+                        "w":w,
+                        "dest":childIdx
+                    })
+                data["Nodes"].append({
+                    "pos":self.graph.get_all_v()[idx].getPos(),
+                    "id":idx
                 })
-            data["Nodes"].append({
-                "pos":self.graph.get_all_v()[idx].getPos(),
-                "id":idx
-            })
-        with open(file_name,'w') as outfile:
-            json.dump(data,outfile)
+            with open(file_name,'w') as outfile:
+                json.dump(data,outfile)
+        except:
+            return False
+        return True
+
+
 
 
 
@@ -72,11 +84,13 @@ class GraphAlgo(GraphAlgoInterface):
         shortestPath = shortestPath[::-1]
         return self.graph.get_all_v()[id2].getDistance(), shortestPath
 
+
     def generate_shortest_path(self,path:List[int],target:int) -> None:
         if(self.graph.get_all_v()[target].getPrev() != None):
             path.append(self.graph.get_all_v()[target].getPrev() )
             self.generate_shortest_path(path,self.graph.get_all_v()[target].getPrev())
         return
+
 
     def add_next_nodes(self,lst:List[dict], node_id:int)->None:
         for k,v in self.graph.all_out_edges_of_node(node_id).items():
@@ -125,6 +139,7 @@ class GraphAlgo(GraphAlgoInterface):
 
 
 
+
     def centerPoint(self) -> tuple[int, float]:
         if False==self.isConnected():
             return None
@@ -164,7 +179,6 @@ class GraphAlgo(GraphAlgoInterface):
 
         return True
 
-        
 
     def dfs(self,idx:int,direction = True) -> None:
         if(self.graph.get_all_v()[idx].getColor() != "white"):
@@ -181,6 +195,7 @@ class GraphAlgo(GraphAlgoInterface):
 
         self.graph.get_all_v()[idx].setColor("black")
         return
+
 
     def all_pairs_shortest_path(self) -> List[List[float]]:
         #newGraph = DiGraph(self.graph,True)
@@ -200,5 +215,45 @@ class GraphAlgo(GraphAlgoInterface):
 
 
 
+
     def plot_graph(self) -> None:
-        pass
+        figure = plt.figure(figsize=(10,10))
+        ax = figure.add_subplot()
+        for id,node in self.graph.get_all_v().items():
+            pos = node.getPos()[:-1]
+            ax.scatter(pos[0],pos[1],c='r')
+            
+
+        for src in self.graph.get_all_v():
+            pos1 = self.graph.get_all_v()[src].getPos()[:-1]
+            for dest,w in self.graph.all_out_edges_of_node(src).items():
+                
+                pos2 = self.graph.get_all_v()[dest].getPos()[:-1]
+                #ax.arrow(pos1[0],pos1[1],pos1[2],pos2[0],pos2[1],pos2[2])
+                con = ConnectionPatch(pos1,pos2,"data",arrowstyle="->")
+                """
+                midPoint = ((pos1[0]+pos2[0])/2,(pos1[1]+pos2[1])/2)
+                
+                an1 = ax.annotate(
+                                w,
+                                xycoords="data",
+                                xy=pos2,
+                                xytext=midPoint,
+                                arrowprops=dict(arrowstyle="->")
+                                )
+
+                ax.annotate(
+                            "",
+                            xy=midPoint,
+                            xytext=pos1,
+                            xycoords="data",
+                            arrowprops=dict(arrowstyle="-")
+                            )
+                            """
+                ax.add_artist(con)
+
+
+        for src in self.graph.get_all_v():
+            pos1 = self.graph.get_all_v()[src].getPos()[:-1]
+            ax.annotate(src,xy=pos1,c='g')
+        plt.show()
