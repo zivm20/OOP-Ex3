@@ -3,9 +3,26 @@ from Node import Node
 
 class DiGraph(GraphInterface):
     """Implementation of GraphInterface"""
-    def __init__(self):
+    def __init__(self,graph:GraphInterface=None,reWeight:bool=False):
+        
         self.nodes = {}
         self.mc = 0
+        
+        if graph != None:
+            minWeight = 0
+            for k in graph.get_all_v():
+                self.add_node(k)
+                if reWeight:
+                    for node2,weight in graph.all_out_edges_of_node(k).items():
+                        minWeight = min(minWeight,weight)
+                        
+            for k in graph.get_all_v():
+                for node2,weight in graph.all_out_edges_of_node(k).items():
+                    if reWeight:
+                        self.add_edge(k,node2,weight+minWeight)
+                    else:
+                        self.add_edge(k,node2,weight)
+
 
     def v_size(self) -> int:
         

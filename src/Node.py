@@ -32,7 +32,10 @@ class Node:
     def setDistance(self,d:float):
         self.distance = d
 
-    def getPrev(self):
+    def getPrev(self) -> int:
         return self.prev
     def setPrev(self,n:int):
         self.prev = n
+
+    def getPos(self) -> tuple:
+        return self.pos

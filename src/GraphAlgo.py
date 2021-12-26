@@ -1,5 +1,8 @@
 from GraphAlgoInterface import GraphAlgoInterface
 from GraphInterface import GraphInterface
+from DiGraph import DiGraph
+import json
+import matplotlib.pyplot as plt
 from typing import List
 class GraphAlgo(GraphAlgoInterface):
     def __init__(self,g:GraphInterface = None):
@@ -8,9 +11,43 @@ class GraphAlgo(GraphAlgoInterface):
     def get_graph(self) -> GraphInterface:
         return self.graph
     def load_from_json(self,json_path:str) -> bool:
-        pass
+        self.graph = DiGraph()
+        try:
+            with open(json_path,'r') as f:
+                data = json.loads(f.read())
+                for node in data["Nodes"].values():
+                    pos = ( float(i) for i in node["pos"].split(',') )
+                    id = node["id"]
+                    self.graph.add_node(id,pos)
+                for edge in data["Edges"].values():
+                    src = edge["src"]
+                    dest = edge["dest"]
+                    w = edge["w"]
+                    self.graph.add_edge(src,dest,w)
+
+        except:
+            return False
+        
     def save_to_json(self, file_name: str) -> bool:
-        pass
+        data = {}
+        data["Edges"] = []
+        data["Nodes"] = []
+        for idx in self.graph.get_all_v():
+            for childIdx,w in self.graph.all_out_edges_of_node(idx).items():
+                data["Edges"].append({
+                    "src":idx,
+                    "w":w,
+                    "dest":childIdx
+                })
+            data["Nodes"].append({
+                "pos":self.graph.get_all_v()[idx].getPos(),
+                "id":idx
+            })
+        with open(file_name,'w') as outfile:
+            json.dump(data,outfile)
+
+
+
     def shortest_path(self, id1: int, id2: int) -> tuple[float, List[int]]:
         for k,v in self.graph.get_all_v().items():
            v.setDistance(float('inf'))
@@ -65,9 +102,27 @@ class GraphAlgo(GraphAlgoInterface):
             if(path_len<best_length):
                 best_lst = path
                 best_length = temp
-        return best_lst
+        return best_lst,best_length
+
+
     def TSP_recursive(self,idx:int,node_lst: List[int]) -> tuple[List[int], float]:
-        pass
+        if node_lst<1:
+            return [],0
+        best_length = float('inf')
+        best_lst = []
+
+        for i in range(len(node_lst)):
+            lenPath1, path_idx_to_node_i = self.shortest_path(idx,node_lst[i])
+            temp = [n for n in node_lst]
+            temp = temp[0:i] + temp[i+1:-1]
+            path_i_to_end,lenPath2 = self.TSP_recursive(node_lst[i], temp)
+            path_idx_to_end = path_idx_to_node_i[:-1] + path_i_to_end
+            path_len = lenPath1+lenPath2
+            if(path_len<best_length):
+                best_length = path_len
+                best_lst = path_idx_to_end
+        return best_lst,best_length
+
 
 
     def centerPoint(self) -> tuple[int, float]:
@@ -76,10 +131,73 @@ class GraphAlgo(GraphAlgoInterface):
         distanceMat = self.all_pairs_shortest_path()
         distances = [max(nodes) for nodes in  distanceMat]
         return distances.index(min(distances)), min(distances) 
+    
+
     def isConnected(self) -> bool:
-        pass
+        flg = True
+        if(self.graph.v_size()==0):
+            return True
+        for k,v in self.graph.get_all_v().items():
+            v.setDistance(float('inf'))
+            v.setColor("white")
+
+        #check if there exists a path between all nodes in the graph 
+        self.dfs(0)
+        for k,v in self.graph.get_all_v().items():
+            if(v.getColor() == "white"):
+                flg = False
+            v.setDistance(float('inf'))
+            v.setColor("white")
+        if flg == False:
+            return False
+        
+        #check if there exists a path between all nodes in the transpose graph 
+        self.dfs(0,False)
+        for k,v in self.graph.get_all_v().items():
+            if(v.getColor() == "white"):
+                flg = False
+            v.setDistance(float('inf'))
+            v.setColor("white")
+        if flg == False:
+            return False
+            
+
+        return True
+
+        
+
+    def dfs(self,idx:int,direction = True) -> None:
+        if(self.graph.get_all_v()[idx].getColor() != "white"):
+            return
+        self.graph.get_all_v()[idx].setColor("gray")
+        #going from parent to child
+        if direction == True:
+            for childIdx in self.graph.all_out_edges_of_node(idx):
+                self.dfs(self.graph.get_all_v()[childIdx])
+        #going from child to parent
+        else:
+            for parentIdx in self.graph.all_in_edges_of_node(idx):
+                self.dfs(self.graph.get_all_v()[parentIdx],False)
+
+        self.graph.get_all_v()[idx].setColor("black")
+        return
+
     def all_pairs_shortest_path(self) -> List[List[float]]:
-        pass
+        #newGraph = DiGraph(self.graph,True)
+        matrix = {j:{i:float('inf') for i in self.graph.get_all_v()} for j in self.graph.get_all_v()}
+        for node in self.graph.get_all_v():
+            remaining_nodes = [ i for i in  self.graph.get_all_v() if matrix[node][i]==float('inf')  ]
+            while remaining_nodes>0:
+                _,node_path = self.shortest_path(node, remaining_nodes[0])
+                
+                for i in range(len(node_path)):
+                    node1 = node_path[i]
+                    for j in range(i,len(node_path)):
+                        node2 = node_path[j]
+                        matrix[node1][node2] = self.graph.get_all_v()[node2].getDistance()-self.graph.get_all_v()[node1].getDistance()
+                    remaining_nodes.remove(node1)
+        return matrix
+
 
 
     def plot_graph(self) -> None:
