@@ -8,7 +8,7 @@ class Node:
         self.distance = float('inf')
         self.prev = None
         if pos==None:
-            pos =tuple(random.randrange(-9,10) for _ in range(3))
+            pos =tuple([random.randrange(-9,10) for _ in range(3)])
         self.pos=pos
 
 

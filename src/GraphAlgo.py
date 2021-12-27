@@ -5,6 +5,9 @@ import json
 import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
 from typing import List
+
+import os, sys
+
 class GraphAlgo(GraphAlgoInterface):
     def __init__(self,g:GraphInterface = None):
         self.graph = g
@@ -13,20 +16,27 @@ class GraphAlgo(GraphAlgoInterface):
         return self.graph
     def load_from_json(self,json_path:str) -> bool:
         self.graph = DiGraph()
+        
+
         try:
             with open(json_path,'r') as f:
                 data = json.loads(f.read())
-                for node in data["Nodes"].values():
-                    pos = ( float(i) for i in node["pos"].split(',') )
+                for node in data["Nodes"]:
+                    if "pos" in node:
+                        pos = tuple([ float(i) for i in node["pos"].split(',')] )
+                    else:
+                        pos = None
                     id = node["id"]
+                    
                     self.graph.add_node(id,pos)
-                for edge in data["Edges"].values():
+                
+                for edge in data["Edges"]:
                     src = edge["src"]
                     dest = edge["dest"]
                     w = edge["w"]
                     self.graph.add_edge(src,dest,w)
-
         except:
+            
             return False
 
         return True
@@ -64,6 +74,7 @@ class GraphAlgo(GraphAlgoInterface):
         for k,v in self.graph.get_all_v().items():
            v.setDistance(float('inf'))
            v.setColor("white")
+           v.setPrev(None)
 
         self.graph.get_all_v()[id1].setDistance(0)
         unVisited = []
@@ -78,6 +89,8 @@ class GraphAlgo(GraphAlgoInterface):
                 continue
             self.graph.get_all_v()[current].setColor("black")
             self.add_next_nodes(unVisited,current)
+        if(self.graph.get_all_v()[id2].getDistance()) == float('inf'):
+            return float('inf'), []
         
         shortestPath = [id2]
         self.generate_shortest_path(shortestPath,id2)
@@ -115,12 +128,12 @@ class GraphAlgo(GraphAlgoInterface):
             path,path_len = self.TSP_recursive(i,temp)
             if(path_len<best_length):
                 best_lst = path
-                best_length = temp
+                best_length = path_len
         return best_lst,best_length
 
 
     def TSP_recursive(self,idx:int,node_lst: List[int]) -> tuple[List[int], float]:
-        if node_lst<1:
+        if len(node_lst)<1:
             return [],0
         best_length = float('inf')
         best_lst = []
@@ -187,11 +200,11 @@ class GraphAlgo(GraphAlgoInterface):
         #going from parent to child
         if direction == True:
             for childIdx in self.graph.all_out_edges_of_node(idx):
-                self.dfs(self.graph.get_all_v()[childIdx])
+                self.dfs(childIdx)
         #going from child to parent
         else:
             for parentIdx in self.graph.all_in_edges_of_node(idx):
-                self.dfs(self.graph.get_all_v()[parentIdx],False)
+                self.dfs(parentIdx,False)
 
         self.graph.get_all_v()[idx].setColor("black")
         return
@@ -219,41 +232,28 @@ class GraphAlgo(GraphAlgoInterface):
     def plot_graph(self) -> None:
         figure = plt.figure(figsize=(10,10))
         ax = figure.add_subplot()
+        nodes = {}
         for id,node in self.graph.get_all_v().items():
             pos = node.getPos()[:-1]
-            ax.scatter(pos[0],pos[1],c='r')
+            #scatter nodes so our graph is large enough
+            ax.scatter(pos[0],pos[1],c="b")
+            
+        for id,node in self.graph.get_all_v().items():
+            pos = node.getPos()[:-1]
+            nodes[id] = ax.annotate(id,pos,xycoords='data', bbox={"boxstyle" : "circle", "color":"r"},ha='center', va='center')
+        
+        for src in self.graph.get_all_v():
+            pos1 = self.graph.get_all_v()[src].getPos()[:-1]
+            
+            for dest,w in self.graph.all_out_edges_of_node(src).items():
+                pos2 = self.graph.get_all_v()[dest].getPos()[:-1]
+                
+               
+                con = ConnectionPatch(pos1,pos2,"data",arrowstyle="-|>",connectionstyle="arc3,rad=0.1",mutation_scale=20,shrinkB=5)
+                ax.add_artist(con)
             
 
-        for src in self.graph.get_all_v():
-            pos1 = self.graph.get_all_v()[src].getPos()[:-1]
-            for dest,w in self.graph.all_out_edges_of_node(src).items():
+
                 
-                pos2 = self.graph.get_all_v()[dest].getPos()[:-1]
-                #ax.arrow(pos1[0],pos1[1],pos1[2],pos2[0],pos2[1],pos2[2])
-                con = ConnectionPatch(pos1,pos2,"data",arrowstyle="->")
-                """
-                midPoint = ((pos1[0]+pos2[0])/2,(pos1[1]+pos2[1])/2)
-                
-                an1 = ax.annotate(
-                                w,
-                                xycoords="data",
-                                xy=pos2,
-                                xytext=midPoint,
-                                arrowprops=dict(arrowstyle="->")
-                                )
 
-                ax.annotate(
-                            "",
-                            xy=midPoint,
-                            xytext=pos1,
-                            xycoords="data",
-                            arrowprops=dict(arrowstyle="-")
-                            )
-                            """
-                ax.add_artist(con)
-
-
-        for src in self.graph.get_all_v():
-            pos1 = self.graph.get_all_v()[src].getPos()[:-1]
-            ax.annotate(src,xy=pos1,c='g')
         plt.show()
