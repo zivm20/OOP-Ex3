@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
 from typing import List
 
-import os, sys
+
 
 class GraphAlgo(GraphAlgoInterface):
     def __init__(self,g:GraphInterface = None):
