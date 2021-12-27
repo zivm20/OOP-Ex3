@@ -10,7 +10,7 @@ class TestGraphAlgo(unittest.TestCase):
         g_algo.load_from_json(file)
         self.assertEqual(str(g_algo.get_graph()),"Graph: |V|=4 , |E|=4")
         self.assertEqual(str(g_algo.get_graph().get_all_v()),r"{0: 0: |edges out| 1 |edges in| 1, 1: 1: |edges out| 1 |edges in| 1, 2: 2: |edges out| 1 |edges in| 1, 4: 4: |edges out| 1 |edges in| 1}")
-
+        g_algo.plot_graph("diamond")
 
 
 if __name__=='__main__':

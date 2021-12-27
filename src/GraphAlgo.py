@@ -1,6 +1,5 @@
 from GraphAlgoInterface import GraphAlgoInterface
 from GraphInterface import GraphInterface
-from Graph_plot import Graph_plot
 from DiGraph import DiGraph
 import json
 import matplotlib.pyplot as plt
@@ -246,7 +245,7 @@ class GraphAlgo(GraphAlgoInterface):
 
 
     
-    def plot_graph(self) -> None:
+    def plot_graph(self,figName=False) -> None:
         figure = plt.figure(figsize=(10,10))
         ax = figure.add_subplot()
         nodes = {}
@@ -264,13 +263,13 @@ class GraphAlgo(GraphAlgoInterface):
             
             for dest,w in self.graph.all_out_edges_of_node(src).items():
                 pos2 = self.graph.get_all_v()[dest].getPos()[:-1]
-                
-               
+
                 con = ConnectionPatch(pos1,pos2,"data",arrowstyle="-|>",connectionstyle="arc3,rad=0.1",mutation_scale=20,shrinkB=5)
                 ax.add_artist(con)
             
 
-
+        if figName != None:
+            plt.savefig("../figures/"+figName+".jpg")
                 
 
         plt.show()
