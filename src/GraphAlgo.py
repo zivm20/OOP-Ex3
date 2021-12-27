@@ -77,15 +77,16 @@ class GraphAlgo(GraphAlgoInterface):
            v.setPrev(None)
 
         self.graph.get_all_v()[id1].setDistance(0)
+        
         unVisited = []
         self.add_next_nodes(unVisited,id1)
 
         while len(unVisited) > 0:
             
             current = unVisited[0]
+            
             unVisited = unVisited[1:]
             if self.graph.get_all_v()[current].getColor() != "white":
-                unVisited = unVisited[1:]
                 continue
             self.graph.get_all_v()[current].setColor("black")
             self.add_next_nodes(unVisited,current)
@@ -124,12 +125,25 @@ class GraphAlgo(GraphAlgoInterface):
         best_length = float('inf')
         for i in range(len(node_lst)):
             temp = [n for n in node_lst]
-            temp = temp[0:i] + temp[i+1:-1]
-            path,path_len = self.TSP_recursive(i,temp)
+            temp = temp[0:i] + temp[i+1:]
+            path_without_i,lenPath1 = self.TSP_recursive(node_lst[i],temp)
+            if len(path_without_i)<=1:
+                continue
+            lenPath2, path_i_to_first = self.shortest_path(node_lst[i],path_without_i[0])
+
+            path = path_i_to_first + path_without_i
+            path_len = lenPath1+lenPath2
+            
             if(path_len<best_length):
                 best_lst = path
                 best_length = path_len
-        return best_lst,best_length
+        out = []
+        
+        for i in range(len(best_lst)):
+            if i<len(best_lst)-1 and best_lst[i] == best_lst[i+1]:
+                continue
+            out.append(best_lst[i])
+        return out,best_length
 
 
     def TSP_recursive(self,idx:int,node_lst: List[int]) -> tuple[List[int], float]:
@@ -141,9 +155,10 @@ class GraphAlgo(GraphAlgoInterface):
         for i in range(len(node_lst)):
             lenPath1, path_idx_to_node_i = self.shortest_path(idx,node_lst[i])
             temp = [n for n in node_lst]
-            temp = temp[0:i] + temp[i+1:-1]
+            temp = temp[0:i] + temp[i+1:]
+            
             path_i_to_end,lenPath2 = self.TSP_recursive(node_lst[i], temp)
-            path_idx_to_end = path_idx_to_node_i[:-1] + path_i_to_end
+            path_idx_to_end = path_idx_to_node_i + path_i_to_end
             path_len = lenPath1+lenPath2
             if(path_len<best_length):
                 best_length = path_len

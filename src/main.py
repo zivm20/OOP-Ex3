@@ -20,7 +20,8 @@ def check():
     """
     #check0()
     #check1()
-    check2()
+    #check2()
+    check3()
 
 
 def check0():
@@ -80,7 +81,8 @@ def check2():
     print(dist, path)
     dist, path = g_algo.shortest_path(2, 20)
     print(dist, path)
-    print(g_algo.TSP([1, 2, 3]))
+    path,dist = g_algo.TSP([1, 2, 3])
+    print(path,dist)
     g_algo.plot_graph()
 
 
