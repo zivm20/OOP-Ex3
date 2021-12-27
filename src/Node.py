@@ -1,14 +1,15 @@
 import random
 class Node:
-    def __init__(self,node_id: int, pos: tuple = None):
+    def __init__(self,node_id: int, pos: tuple = None,random_range=10):
         self.parents = {}
         self.children = {}
+        random_range = max(10,random_range)
         self.id = node_id
         self.color = "white"
         self.distance = float('inf')
         self.prev = None
         if pos==None:
-            pos =tuple([random.randrange(-9,10) for _ in range(3)])
+            pos =tuple([random.randrange(-10,10) for _ in range(3)])
         self.pos=pos
 
     def __repr__(self): #0: |edges out| 1 |edges in| 1

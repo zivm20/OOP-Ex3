@@ -173,8 +173,9 @@ class GraphAlgo(GraphAlgoInterface):
         if False==self.isConnected():
             return None
         distanceMat = self.all_pairs_shortest_path()
-        distances = [max(nodes) for nodes in  distanceMat]
-        return distances.index(min(distances)), min(distances) 
+        distances = { i: max(nodes.values())  for i,nodes in  distanceMat.items()}
+        
+        return min(distances.items(), key=lambda x: x[1])
     
 
     def isConnected(self) -> bool:
@@ -230,16 +231,20 @@ class GraphAlgo(GraphAlgoInterface):
         #newGraph = DiGraph(self.graph,True)
         matrix = {j:{i:float('inf') for i in self.graph.get_all_v()} for j in self.graph.get_all_v()}
         for node in self.graph.get_all_v():
-            remaining_nodes = [ i for i in  self.graph.get_all_v() if matrix[node][i]==float('inf')  ]
-            while remaining_nodes>0:
+            remaining_nodes = [ i for i in  self.graph.get_all_v() if ( matrix[node][i]==float('inf') and node!=i)  ]
+            while len(remaining_nodes)>0:
                 _,node_path = self.shortest_path(node, remaining_nodes[0])
                 
                 for i in range(len(node_path)):
                     node1 = node_path[i]
+                    
                     for j in range(i,len(node_path)):
+                        
                         node2 = node_path[j]
-                        matrix[node1][node2] = self.graph.get_all_v()[node2].getDistance()-self.graph.get_all_v()[node1].getDistance()
-                    remaining_nodes.remove(node1)
+                        matrix[node1][node2] = min(matrix[node1][node2],self.graph.get_all_v()[node2].getDistance()-self.graph.get_all_v()[node1].getDistance())
+                
+                remaining_nodes = [ i for i in  self.graph.get_all_v() if ( matrix[node][i]==float('inf'))  ]
+            
         return matrix
 
 

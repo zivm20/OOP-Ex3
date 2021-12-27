@@ -27,6 +27,7 @@ class DiGraph(GraphInterface):
         return "Graph: |V|="+str(self.v_size())+" , |E|="+str(self.e_size())
     def __str__(self):
         return self.__repr__()
+
     def v_size(self) -> int:
         
         return len(self.nodes)
@@ -56,7 +57,7 @@ class DiGraph(GraphInterface):
 
     def add_node(self, node_id: int, pos: tuple = None) -> bool:
         if (node_id in self.nodes.keys()) == False:
-            self.nodes[node_id] = Node(node_id,pos)
+            self.nodes[node_id] = Node(node_id,pos,self.v_size())
             self.mc+=1
             return True
         return False

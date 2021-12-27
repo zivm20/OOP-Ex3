@@ -6,10 +6,6 @@
 
 ## Algorithem implementations
 
-
-## Testing cases
-### Our Testing graphs
-
 ## Benchmarking
 
 
