@@ -14,7 +14,7 @@ class Node:
     def __repr__(self): #0: |edges out| 1 |edges in| 1
         return str(self.id)+": |edges out| "+str(len(self.children))+" |edges in| "+str(len(self.parents))
     def __str__(self):
-        return self.__repr__
+        return self.__repr__()
     def getParents(self) -> dict:
         return self.parents
     def addParent(self,node_id: int,weight:float) -> None:

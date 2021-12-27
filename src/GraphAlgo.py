@@ -251,7 +251,7 @@ class GraphAlgo(GraphAlgoInterface):
         for id,node in self.graph.get_all_v().items():
             pos = node.getPos()[:-1]
             #scatter nodes so our graph is large enough
-            ax.scatter(pos[0],pos[1],c="b")
+            ax.scatter(pos[0],pos[1],c="r")
             
         for id,node in self.graph.get_all_v().items():
             pos = node.getPos()[:-1]

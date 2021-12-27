@@ -26,7 +26,7 @@ class DiGraph(GraphInterface):
     def __repr__(self):
         return "Graph: |V|="+str(self.v_size())+" , |E|="+str(self.e_size())
     def __str__(self):
-        return self.__repr__
+        return self.__repr__()
     def v_size(self) -> int:
         
         return len(self.nodes)
