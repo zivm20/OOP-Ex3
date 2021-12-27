@@ -5,6 +5,8 @@ import json
 import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
 from typing import List
+import pygame as pg
+from pygame.locals import *
 
 
 
@@ -243,7 +245,7 @@ class GraphAlgo(GraphAlgoInterface):
 
 
 
-
+    """
     def plot_graph(self) -> None:
         figure = plt.figure(figsize=(10,10))
         ax = figure.add_subplot()
@@ -272,3 +274,24 @@ class GraphAlgo(GraphAlgoInterface):
                 
 
         plt.show()
+        """
+
+    def plot_graph(self) -> None:
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
