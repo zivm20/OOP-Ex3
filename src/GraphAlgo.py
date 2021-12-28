@@ -234,19 +234,27 @@ class GraphAlgo(GraphAlgoInterface):
         return
 
 
+    
+    
     def all_pairs_shortest_path(self) -> List[List[float]]:
         matrix = {j:{i:float('inf') for i in self.graph.get_all_v()} for j in self.graph.get_all_v()}
-        for node in self.graph.get_all_v():
-            remaining_nodes = [ i for i in  self.graph.get_all_v() if ( matrix[node][i]==float('inf') and node!=i)  ]
-            while len(remaining_nodes)>0:
-                _,node_path = self.shortest_path(node, remaining_nodes[0])
-                for i in range(len(node_path)):
-                    node1 = node_path[i]
-                    for j in range(i,len(node_path)):
-                        node2 = node_path[j]
-                        matrix[node1][node2] = min(matrix[node1][node2],self.graph.get_all_v()[node2].getDistance()-self.graph.get_all_v()[node1].getDistance())
-                remaining_nodes = [ i for i in  self.graph.get_all_v() if ( matrix[node][i]==float('inf'))  ]
+        for src in self.graph.get_all_v():
+            for dest,w in self.graph.all_out_edges_of_node(src).items():
+                matrix[src][dest] = w
+        for matNum in self.graph.get_all_v():
+            new_nodes = [i for i in self.graph.get_all_v() if i!=matNum]
+            for src in new_nodes:
+                for dest in new_nodes:
+                    if(src != dest):
+                        if matrix[src][matNum] != float('inf') and matrix[matNum][dest] != float('inf'):
+                            matrix[src][dest] = min(matrix[src][dest], matrix[src][matNum] + matrix[matNum][dest])
+                    else:
+                        matrix[src][dest] = 0
         return matrix
+            
+
+        
+
 
 
 

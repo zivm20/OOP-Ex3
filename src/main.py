@@ -25,7 +25,7 @@ def check():
     #check1()
     #check2()
     #check3()
-    #create_benchmark( [50,100,500,1000])
+    #create_benchmark( [50,100,500,800])
     benchmark()
 
 
