@@ -53,24 +53,32 @@ class TestGraphAlgo(unittest.TestCase):
         g_algo.load_from_json(file)
         self.assertEqual(str(g_algo.get_graph()),"Graph: |V|=3 , |E|=2")
         self.assertEqual(str(g_algo.get_graph().get_all_v()),r"{0: 0: |edges out| 1 |edges in| 0, 1: 1: |edges out| 1 |edges in| 1, 2: 2: |edges out| 0 |edges in| 1}")
-
+        #test copy constructor for graph
+        graph_copy = DiGraph(g_algo.get_graph())
+        self.assertEqual(str(graph_copy),"Graph: |V|=3 , |E|=2")
         #add a node that exists
         self.assertEqual(g_algo.get_graph().add_node(1),False)
+        #add an edge that exists
+        self.assertEqual(g_algo.get_graph().add_edge(1,2),False)
+        #add non existing node 
         self.assertEqual(g_algo.get_graph().add_node(7),True)
-        #remove when 1 node doesn't exist
+        #add valid edge
+        self.assertEqual(g_algo.get_graph().add_edge(2,1),True)
+        #remove/add when 1 node doesn't exist
         self.assertEqual(g_algo.get_graph().remove_edge(1,5),False)
-        #remove when both nodes don't exist
+        self.assertEqual(g_algo.get_graph().add_edge(1,5),False)
+        #remove/add when both nodes don't exist
         self.assertEqual(g_algo.get_graph().remove_edge(8,5),False)
+        self.assertEqual(g_algo.get_graph().add_edge(8,5),False)
         #remove when both nodes exists but an edge doesn't
         self.assertEqual(g_algo.get_graph().remove_edge(1,7),False)
         #remove a node that doesn't exist
         self.assertEqual(g_algo.get_graph().remove_node(4),False)
-        
+        #add a new edge
+        self.assertEqual(g_algo.get_graph().add_edge(1,2),False)
 
-
-
-
-
+        #test that changes didn't apply to the copied graph
+        self.assertEqual(str(graph_copy),"Graph: |V|=3 , |E|=2")
 
 
     def test_center(self):
