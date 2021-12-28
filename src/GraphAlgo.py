@@ -2,10 +2,7 @@ from GraphAlgoInterface import GraphAlgoInterface
 from GraphInterface import GraphInterface
 from DiGraph import DiGraph
 import json
-import matplotlib.pyplot as plt
-from matplotlib.patches import ConnectionPatch
 from typing import List
-
 from Graph_plot import Graph_plot
 
 
@@ -85,7 +82,6 @@ class GraphAlgo(GraphAlgoInterface):
            v.setPrev(None)
 
         self.graph.get_all_v()[id1].setDistance(0)
-        
         unVisited = []
         self.add_next_nodes(unVisited,id1)
 
@@ -234,8 +230,6 @@ class GraphAlgo(GraphAlgoInterface):
         return
 
 
-    
-    
     def all_pairs_shortest_path(self) -> List[List[float]]:
         matrix = {j:{i:float('inf') for i in self.graph.get_all_v()} for j in self.graph.get_all_v()}
         for src in self.graph.get_all_v():
@@ -253,67 +247,7 @@ class GraphAlgo(GraphAlgoInterface):
         return matrix
             
 
-        
-
-
-
-
-    """
-    def plot_graph(self,figName=False,mark_nodes=[],mark_edges=[]) -> None:
-        figure = plt.figure(figsize=(10,10))
-        ax = figure.add_subplot()
-        nodes = {}
-        for id,node in self.graph.get_all_v().items():
-            pos = node.getPos()[:-1]
-            #scatter nodes so our graph is large enough
-            ax.scatter(pos[0],pos[1],c="r")
             
-        for id,node in self.graph.get_all_v().items():
-            pos = node.getPos()[:-1]
-            c="r"
-            #build circles with each node's id on the circles on top of the scatter
-            if id in mark_nodes:
-                c = "g"
-            nodes[id] = ax.annotate(id,pos,xycoords='data', bbox={"boxstyle" : "circle", "color":c},ha='center', va='center')
-            
-        for src in self.graph.get_all_v():
-            pos1 = self.graph.get_all_v()[src].getPos()[:-1]
-            
-            for dest,w in self.graph.all_out_edges_of_node(src).items():
-                pos2 = self.graph.get_all_v()[dest].getPos()[:-1]
-                #add a nice arrow for each edge
-                if [src,dest] in mark_edges:
-                   
-                    midPoint = ((pos1[0]+pos2[0])/2,(pos1[1]+pos2[1])/2)
-                    an1 = ax.annotate(
-                                    w,
-                                    xycoords="data",
-                                    xy=pos2,
-                                    xytext=midPoint,
-                                    arrowprops=dict(arrowstyle="->",color="g"),
-                                    bbox={"color":"g"}
-
-                                    )
-                    ax.annotate(
-                                "",
-                                xy=(0.5,0.5),
-                                xytext=pos1,
-                                xycoords=an1,
-                                textcoords="data",
-                                arrowprops=dict(arrowstyle="-",color="g")
-                                )
-                else:
-                    con = ConnectionPatch(pos1,pos2,"data",arrowstyle="-|>",connectionstyle="arc3,rad=0.1",mutation_scale=20,shrinkB=5)
-                    ax.add_artist(con)
-            
-        if figName != None:
-            #add support for saving figure
-            plt.savefig("../figures/"+figName+".jpg")
-                
-
-        plt.show()
-
-    """
     def plot_graph(self) -> None:
         Graph_plot(setupArgs=self)
 

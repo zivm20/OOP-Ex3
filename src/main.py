@@ -1,10 +1,10 @@
 from DiGraph import DiGraph
 from GraphAlgo import GraphAlgo
-import os, sys
+import os
 import time
 import pandas as pd
 import random
-import math
+
 def check():
     """
     Graph: |V|=4 , |E|=5
@@ -25,7 +25,7 @@ def check():
     #check1()
     #check2()
     #check3()
-    #create_benchmark( [50,100,500,800])
+    create_benchmark( [50,100,500,800,1000,10000])
     benchmark()
 
 
@@ -97,8 +97,7 @@ def benchmark():
     #graphs_folder = "../benchmark/graphs"
     #graphs = {f:graphs_folder+"/" + f for f in  os.listdir( graphs_folder )}
     data = get_results()
-    with open("../benchmark/python_out.csv", 'w') as f:
-        f.write(data)
+    pd.DataFrame(data=data).to_csv("../benchmark/python_out.csv",index=False)
 
 
 
@@ -109,7 +108,7 @@ def get_results():
     #structure:
     #json / (node1,node2) (node1,node2) (node1 node2)... / (node1,node2,....) (node1,node2,...)
     done = 0
-    data = ""
+    data = data = {"json_file":[], "node_size":[], "avg_edges_per_node":[], "time_load":[], "shortest_path":[] , "TSP":[] , "center_point":[]}
     for line in lines:
         out = ""
         items = line.strip().split(" / ")
@@ -121,7 +120,10 @@ def get_results():
         end = time.time()
         print("loaded "+items[0])
         v_size = g_algo.get_graph().v_size()
-        
+        data["json_file"].append(items[0])
+        data["node_size"].append(v_size)
+        data["avg_edges_per_node"].append(g_algo.get_graph().e_size()*2/v_size)
+        data["time_load"].append(end-start)
         out= out + str(v_size) + ", " + str(g_algo.get_graph().e_size()*2/v_size) + ", " + str(end-start) + ", "
         
         sp_params = items[1].split(" ")
@@ -134,6 +136,7 @@ def get_results():
             sum+=end-start
         out = out + str(sum/len(sp_params)) +", "
         print("done shortest_path for "+items[0])
+        data["shortest_path"].append(sum/len(sp_params))
 
         sum=0
         sp_params = items[2].split(" ")
@@ -145,14 +148,16 @@ def get_results():
             sum+=end-start
         out = out + str(sum/len(sp_params)) +", "
         print("done TSP for "+items[0])
+        data["TSP"].append(sum/len(sp_params))
 
 
         start = time.time()
         g_algo.centerPoint()
         end = time.time()
         out = out + str(end-start)
-        data = data+out+"\n"
+        
         print("done center_point for "+items[0])
+        data["center_point"].append(end-start)
         print(out)
 
         done+=1

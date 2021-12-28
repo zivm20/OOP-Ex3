@@ -3,7 +3,9 @@ from GraphAlgo import GraphAlgo
 
 def main(file):
     g_algo = GraphAlgo()
-    g_algo.load_from_json(file)
+    
+    g_algo.load_from_json("../data/"+file)
+    
     g_algo.plot_graph()
 
 
