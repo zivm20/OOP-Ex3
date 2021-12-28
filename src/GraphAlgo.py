@@ -249,7 +249,7 @@ class GraphAlgo(GraphAlgoInterface):
 
 
     
-    def plot_graph(self,figName=False) -> None:
+    def plot_graph(self,figName=False,mark_nodes=[],mark_edges=[]) -> None:
         figure = plt.figure(figsize=(10,10))
         ax = figure.add_subplot()
         nodes = {}
@@ -260,17 +260,41 @@ class GraphAlgo(GraphAlgoInterface):
             
         for id,node in self.graph.get_all_v().items():
             pos = node.getPos()[:-1]
+            c="r"
             #build circles with each node's id on the circles on top of the scatter
-            nodes[id] = ax.annotate(id,pos,xycoords='data', bbox={"boxstyle" : "circle", "color":"r"},ha='center', va='center')
-        
+            if id in mark_nodes:
+                c = "g"
+            nodes[id] = ax.annotate(id,pos,xycoords='data', bbox={"boxstyle" : "circle", "color":c},ha='center', va='center')
+            
         for src in self.graph.get_all_v():
             pos1 = self.graph.get_all_v()[src].getPos()[:-1]
             
             for dest,w in self.graph.all_out_edges_of_node(src).items():
                 pos2 = self.graph.get_all_v()[dest].getPos()[:-1]
                 #add a nice arrow for each edge
-                con = ConnectionPatch(pos1,pos2,"data",arrowstyle="-|>",connectionstyle="arc3,rad=0.1",mutation_scale=20,shrinkB=5)
-                ax.add_artist(con)
+                if [src,dest] in mark_edges:
+                   
+                    midPoint = ((pos1[0]+pos2[0])/2,(pos1[1]+pos2[1])/2)
+                    an1 = ax.annotate(
+                                    w,
+                                    xycoords="data",
+                                    xy=pos2,
+                                    xytext=midPoint,
+                                    arrowprops=dict(arrowstyle="->",color="g"),
+                                    bbox={"color":"g"}
+
+                                    )
+                    ax.annotate(
+                                "",
+                                xy=(0.5,0.5),
+                                xytext=pos1,
+                                xycoords=an1,
+                                textcoords="data",
+                                arrowprops=dict(arrowstyle="-",color="g")
+                                )
+                else:
+                    con = ConnectionPatch(pos1,pos2,"data",arrowstyle="-|>",connectionstyle="arc3,rad=0.1",mutation_scale=20,shrinkB=5)
+                    ax.add_artist(con)
             
         if figName != None:
             #add support for saving figure
