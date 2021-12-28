@@ -57,8 +57,13 @@ class GraphAlgo(GraphAlgoInterface):
                         "w":w,
                         "dest":childIdx
                     })
+                pos = str(self.graph.get_all_v()[idx].getPos())
+                if '(' and ')' in pos:
+                    pos = pos[1:-1]
+                    pos.replace(" ","")
+                
                 data["Nodes"].append({
-                    "pos":self.graph.get_all_v()[idx].getPos(),
+                    "pos":pos,
                     "id":idx
                 })
             with open(file_name,'w') as outfile:
@@ -210,7 +215,7 @@ class GraphAlgo(GraphAlgoInterface):
         return True
 
 
-    def dfs(self,idx:int,direction = True) -> None:
+    def dfs(self,idx:int,direction:bool = True) -> None:
         if(self.graph.get_all_v()[idx].getColor() != "white"):
             return
         self.graph.get_all_v()[idx].setColor("gray")
@@ -228,23 +233,17 @@ class GraphAlgo(GraphAlgoInterface):
 
 
     def all_pairs_shortest_path(self) -> List[List[float]]:
-        #newGraph = DiGraph(self.graph,True)
         matrix = {j:{i:float('inf') for i in self.graph.get_all_v()} for j in self.graph.get_all_v()}
         for node in self.graph.get_all_v():
             remaining_nodes = [ i for i in  self.graph.get_all_v() if ( matrix[node][i]==float('inf') and node!=i)  ]
             while len(remaining_nodes)>0:
                 _,node_path = self.shortest_path(node, remaining_nodes[0])
-                
                 for i in range(len(node_path)):
                     node1 = node_path[i]
-                    
                     for j in range(i,len(node_path)):
-                        
                         node2 = node_path[j]
                         matrix[node1][node2] = min(matrix[node1][node2],self.graph.get_all_v()[node2].getDistance()-self.graph.get_all_v()[node1].getDistance())
-                
                 remaining_nodes = [ i for i in  self.graph.get_all_v() if ( matrix[node][i]==float('inf'))  ]
-            
         return matrix
 
 
@@ -261,6 +260,7 @@ class GraphAlgo(GraphAlgoInterface):
             
         for id,node in self.graph.get_all_v().items():
             pos = node.getPos()[:-1]
+            #build circles with each node's id on the circles on top of the scatter
             nodes[id] = ax.annotate(id,pos,xycoords='data', bbox={"boxstyle" : "circle", "color":"r"},ha='center', va='center')
         
         for src in self.graph.get_all_v():
@@ -268,12 +268,12 @@ class GraphAlgo(GraphAlgoInterface):
             
             for dest,w in self.graph.all_out_edges_of_node(src).items():
                 pos2 = self.graph.get_all_v()[dest].getPos()[:-1]
-
+                #add a nice arrow for each edge
                 con = ConnectionPatch(pos1,pos2,"data",arrowstyle="-|>",connectionstyle="arc3,rad=0.1",mutation_scale=20,shrinkB=5)
                 ax.add_artist(con)
             
-
         if figName != None:
+            #add support for saving figure
             plt.savefig("../figures/"+figName+".jpg")
                 
 

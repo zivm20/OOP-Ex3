@@ -40,7 +40,7 @@ class DiGraph(GraphInterface):
         return self.mc
 
     def add_edge(self, id1: int, id2: int, weight: float) -> bool:
-        if id1 in self.nodes.keys() and id2 in self.nodes.keys() and (id1 in self.nodes[id2].getParents()) == False:
+        if id1 in self.nodes and id2 in self.nodes and (id1 in self.nodes[id2].getParents()) == False:
             self.nodes[id1].addChild(id2,weight)
             self.nodes[id2].addParent(id1,weight)
             self.mc += 1
@@ -48,17 +48,20 @@ class DiGraph(GraphInterface):
         return False
 
     def add_node(self, node_id: int, pos: tuple = None) -> bool:
-        if (node_id in self.nodes.keys()) == False:
+        if (node_id in self.nodes) == False:
             self.nodes[node_id] = Node(node_id,pos,self.v_size())
             self.mc+=1
             return True
         return False
 
     def remove_node(self, node_id: int) -> bool:
-        if node_id in self.nodes.keys():
-            for idx in self.nodes[node_id].getParents.keys():
+        if node_id in self.nodes:
+            parents_idx = [idx for idx in self.nodes[node_id].getParents()]
+            children_idx = [idx for idx in self.nodes[node_id].getChildren()]
+            
+            for idx in parents_idx:
                 self.remove_edge(idx,node_id)
-            for idx in self.nodes[node_id].getChildren.keys():
+            for idx in children_idx:
                 self.remove_edge(node_id,idx)
             del self.nodes[node_id]
             return True
@@ -66,7 +69,7 @@ class DiGraph(GraphInterface):
         
 
     def remove_edge(self, node_id1: int, node_id2: int) -> bool:
-        if node_id1 in self.nodes.keys() and node_id2 in self.nodes.keys() and node_id1 in self.nodes[node_id2].getParents():
+        if node_id1 in self.nodes and node_id2 in self.nodes and node_id1 in self.nodes[node_id2].getParents():
             del self.nodes[node_id1].getChildren()[node_id2]
             del self.nodes[node_id2].getParents()[node_id1]
             self.mc += 1
