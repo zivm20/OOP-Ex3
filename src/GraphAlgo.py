@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
 from typing import List
 
+from Graph_plot import Graph_plot
+
 
 
 
@@ -248,7 +250,7 @@ class GraphAlgo(GraphAlgoInterface):
 
 
 
-    
+    """
     def plot_graph(self,figName=False,mark_nodes=[],mark_edges=[]) -> None:
         figure = plt.figure(figsize=(10,10))
         ax = figure.add_subplot()
@@ -303,8 +305,9 @@ class GraphAlgo(GraphAlgoInterface):
 
         plt.show()
 
-
-
+    """
+    def plot_graph(self) -> None:
+        Graph_plot(setupArgs=self)
 
 
 
