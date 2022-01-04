@@ -7,7 +7,7 @@ import random
 
 def check():
     
-    #create_benchmark( [50,100,500,800])
+    create_benchmark( [50,100,500,800])
     benchmark()
 
 
